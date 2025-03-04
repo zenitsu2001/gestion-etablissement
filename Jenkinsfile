@@ -9,7 +9,7 @@ pipeline {
     stages {
 		stage('Cloner le repo') {
 			steps {
-				git 'https://github.com/zenitsu2001/gestion-etablissement.git'
+				git branch: 'main', url: 'https://github.com/zenitsu2001/gestion-etablissement.git'
             }
         }
 
