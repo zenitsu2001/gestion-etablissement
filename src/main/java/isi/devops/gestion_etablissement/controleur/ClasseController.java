@@ -1,13 +1,15 @@
 package isi.devops.gestion_etablissement.controleur;
+
 import isi.devops.gestion_etablissement.domaine.Classe;
 import isi.devops.gestion_etablissement.service.ClasseService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/classes")
-@CrossOrigin("*")
+@Controller
+@RequestMapping("/classes")
 public class ClasseController {
 
     private final ClasseService classeService;
@@ -16,28 +18,69 @@ public class ClasseController {
         this.classeService = classeService;
     }
 
-    @PostMapping
-    public Classe createClasse(@RequestBody Classe classe) {
-        return classeService.createClasse(classe);
-    }
-
-    @GetMapping("/{id}")
-    public Classe getClasse(@PathVariable Long id) {
-        return classeService.getClasseById(id);
-    }
-
+    /**
+     * Affiche la liste des classes
+     */
     @GetMapping
-    public List<Classe> getAllClasses() {
-        return classeService.getAllClasses();
+    public String getAllClasses(Model model) {
+        List<Classe> classes = classeService.getAllClasses();
+        model.addAttribute("classes", classes);
+        return "classes/getAllClasses";  // Fichier Thymeleaf : templates/classes/liste.html
     }
 
-    @PutMapping("/{id}")
-    public Classe updateClasse(@PathVariable Long id, @RequestBody Classe classe) {
-        return classeService.updateClasse(id, classe);
+    /**
+     * Affiche les détails d'une classe
+     */
+    @GetMapping("/{id}")
+    public String getClasse(@PathVariable Long id, Model model) {
+        Classe classe = classeService.getClasseById(id);
+        model.addAttribute("classe", classe);
+        return "classes/details";  // Fichier Thymeleaf : templates/classes/details.html
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteClasse(@PathVariable Long id) {
+    /**
+     * Formulaire de création d'une classe
+     */
+    @GetMapping("/new")
+    public String showCreateForm(Model model) {
+        model.addAttribute("classe", new Classe());
+        return "classes/createClasse";  // Fichier Thymeleaf : templates/classes/form.html
+    }
+
+    /**
+     * Traitement du formulaire de création
+     */
+    @PostMapping
+    public String createClasse(@ModelAttribute Classe classe) {
+        classeService.createClasse(classe);
+        return "redirect:/classes";
+    }
+
+    /**
+     * Formulaire de modification
+     */
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable Long id, Model model) {
+        Classe classe = classeService.getClasseById(id);
+        model.addAttribute("classe", classe);
+        return "classes/form";  // Réutilisation du même formulaire pour l'édition
+    }
+
+    /**
+     * Traitement de la modification
+     */
+    @PostMapping("/{id}")
+    public String updateClasse(@PathVariable Long id, @ModelAttribute Classe classe) {
+        classeService.updateClasse(id, classe);
+        return "redirect:/classes";
+    }
+
+    /**
+     * Suppression d'une classe
+     */
+    @GetMapping("/delete/{id}")
+    public String deleteClasse(@PathVariable Long id) {
         classeService.deleteClasse(id);
+        return "redirect:/classes";
     }
 }
